@@ -44,13 +44,24 @@ const {
   BCRYPT_SALT_ROUNDS = 10,
 } = process.env;
 
+const cleanString = (value, fallback = '') => {
+  if (!value) return fallback;
+  return String(value).trim().replace(/^['"]|['"]$/g, '');
+};
+
+const cleanPath = (value, fallback) => {
+  const cleaned = cleanString(value, fallback);
+  const withLeadingSlash = cleaned.startsWith('/') ? cleaned : `/${cleaned}`;
+  return withLeadingSlash.replace(/\/+$/g, '') || fallback;
+};
+
 export default {
   NODE_ENV: NODE_ENV || 'development',
   PORT: Number(PORT),
   HOST,
   MONGODB_URI,
-  API_BASE_PATH,
-  FRONTEND_URL: FRONTEND_URL.split(',').map((url) => url.trim()).filter(Boolean),
+  API_BASE_PATH: cleanPath(API_BASE_PATH, '/api/v1'),
+  FRONTEND_URL: FRONTEND_URL.split(',').map((url) => cleanString(url)).filter(Boolean),
 
   JWT_ACCESS_SECRET,
   JWT_REFRESH_SECRET,

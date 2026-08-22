@@ -40,6 +40,7 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use(`${basePath}/auth`, authRoutes);
+app.use('/auth', authRoutes);
 
 // 404 handler
 app.use((req, res) => {
