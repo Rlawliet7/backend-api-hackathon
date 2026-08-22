@@ -12,4 +12,11 @@ router.post('/refresh', refresh);
 router.post('/logout', protect, logout);
 router.get('/me', protect, getMe);
 
+router.all(['/register', '/login', '/google', '/refresh', '/logout'], (req, res) => {
+  res.status(405).json({
+    success: false,
+    message: `Method ${req.method} tidak didukung. Gunakan POST untuk endpoint ini.`,
+  });
+});
+
 export default router;
