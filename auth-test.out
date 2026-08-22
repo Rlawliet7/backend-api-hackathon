@@ -1,0 +1,3 @@
+Server running on port 5055
+MongoDB connected
+[0mGET /health [32m200[0m 38.342 ms - 46[0m
