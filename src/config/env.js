@@ -8,10 +8,8 @@ dotenv.config({
 const {
   NODE_ENV,
   PORT = 5000,
-  HOST = '0.0.0.0',
   MONGODB_URI,
   API_BASE_PATH = '/api/v1',
-  FRONTEND_URL = 'http://localhost:5173,http://localhost:3000',
 
   // JWT (user auth)
   JWT_ACCESS_SECRET,
@@ -58,10 +56,8 @@ const cleanPath = (value, fallback) => {
 export default {
   NODE_ENV: NODE_ENV || 'development',
   PORT: Number(PORT),
-  HOST,
   MONGODB_URI,
   API_BASE_PATH: cleanPath(API_BASE_PATH, '/api/v1'),
-  FRONTEND_URL: FRONTEND_URL.split(',').map((url) => cleanString(url)).filter(Boolean),
 
   JWT_ACCESS_SECRET,
   JWT_REFRESH_SECRET,
