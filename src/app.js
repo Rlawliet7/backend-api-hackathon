@@ -5,7 +5,14 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.routes.js';
-import errorHandler from './middlewares/errorhandler.middleware.js';
+import usersRoutes from './routes/user.routes.js';
+import productsRoutes from './routes/products.routes.js';
+import categoriesRoutes from './routes/categories.routes.js';
+import cartRoutes from './routes/cart.routes.js';
+import ordersRoutes from './routes/orders.routes.js';
+import paymentsRoutes from './routes/payments.routes.js';
+import stockRoutes from './routes/stock.routes.js';
+import errorHandler from './middlewares/errorHandler.middleware.js';
 
 const app = express();
 
@@ -27,6 +34,13 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use(`${basePath}/auth`, authRoutes);
+app.use(`${basePath}/users`, usersRoutes);
+app.use(`${basePath}/products`, productsRoutes);
+app.use(`${basePath}/categories`, categoriesRoutes);
+app.use(`${basePath}/cart`, cartRoutes);
+app.use(`${basePath}/orders`, ordersRoutes);
+app.use(`${basePath}/payments`, paymentsRoutes);
+app.use(`${basePath}/stock`, stockRoutes);
 
 // 404 handler
 app.use((req, res) => {

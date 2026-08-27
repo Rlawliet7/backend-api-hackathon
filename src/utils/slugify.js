@@ -1,0 +1,13 @@
+/**
+ * Ubah teks jadi slug URL-friendly, mis. "Kopi Susu Gula Aren" -> "kopi-susu-gula-aren"
+ */
+const slugify = (text) =>
+  text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+
+export default slugify;

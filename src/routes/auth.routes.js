@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { register, login, googleAuth, refresh, logout, getMe } from '../controllers/auth.controller.js';
+import { register, login, googleAuth, refresh, logout, getMe } from '../controllers/auth.contrroler.js';
 import { protect } from '../middlewares/auth.middleware.js';
 import { authLimiter, googleAuthLimiter } from '../middlewares/ratelimitter.middleware.js';
 
