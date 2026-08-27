@@ -12,7 +12,7 @@ import cartRoutes from './routes/cart.routes.js';
 import ordersRoutes from './routes/orders.routes.js';
 import paymentsRoutes from './routes/payments.routes.js';
 import stockRoutes from './routes/stock.routes.js';
-import errorHandler from './middlewares/errorHandler.middleware.js';
+import errorHandler from './middlewares/errorhandler.middleware.js';
 
 const app = express();
 
@@ -50,6 +50,10 @@ app.use((req, res) => {
 // Global error handler (harus paling akhir)
 app.use(errorHandler);
 
-app.listen(env.PORT, () => {
-  console.log(`Server running on port ${env.PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(env.PORT, () => {
+    console.log(`Server running on port ${env.PORT}`);
+  });
+}
+
+export default app;
