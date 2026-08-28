@@ -14,7 +14,9 @@ const connectDB = async () => {
   }
 
   try {
-    cachedConnection = await mongoose.connect(env.MONGODB_URI);
+    cachedConnection = await mongoose.connect(env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 10000,
+    });
     console.log('MongoDB connected');
     return true;
   } catch (err) {

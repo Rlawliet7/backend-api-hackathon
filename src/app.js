@@ -16,9 +16,6 @@ import errorHandler from './middlewares/errorhandler.middleware.js';
 
 const app = express();
 
-// Connect DB
-connectDB();
-
 // Global middlewares
 app.use(helmet());
 app.use(cors());
@@ -30,6 +27,19 @@ const basePath = env.API_BASE_PATH;
 // Health check
 app.get('/health', (req, res) => {
   res.json({ success: true, message: 'Server is running' });
+});
+
+app.use(async (req, res, next) => {
+  const isConnected = await connectDB();
+
+  if (!isConnected) {
+    return res.status(503).json({
+      success: false,
+      message: 'Database connection is not available.',
+    });
+  }
+
+  return next();
 });
 
 // Routes
