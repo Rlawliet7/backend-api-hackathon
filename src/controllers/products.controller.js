@@ -13,6 +13,23 @@ const SORT_MAP = {
   rating: { averageRating: -1 },
 };
 
+const resolveCategory = async (value) => {
+  if (!value) return null;
+
+  const categoryValue = String(value).trim();
+
+  if (mongoose.Types.ObjectId.isValid(categoryValue)) {
+    return Category.findById(categoryValue);
+  }
+
+  return Category.findOne({
+    $or: [
+      { slug: slugify(categoryValue) },
+      { name: { $regex: `^${categoryValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } },
+    ],
+  });
+};
+
 /**
  * GET /products — Public
  * Query: ?search=&category=&minPrice=&maxPrice=&sort=&page=&limit=
@@ -98,6 +115,8 @@ export const createProduct = catchAsync(async (req, res) => {
     name,
     description,
     categoryId,
+    category,
+    categoryName,
     price,
     discountPrice,
     images,
@@ -106,13 +125,15 @@ export const createProduct = catchAsync(async (req, res) => {
     unit,
   } = req.body;
 
-  if (!sku || !barcode || !name || !categoryId || price === undefined) {
-    throw new ApiError(400, 'sku, barcode, name, categoryId, dan price wajib diisi.');
+  const categoryInput = categoryId || category || categoryName;
+
+  if (!sku || !barcode || !name || !categoryInput || price === undefined) {
+    throw new ApiError(400, 'sku, barcode, name, categoryId/category, dan price wajib diisi.');
   }
 
-  const category = await Category.findById(categoryId);
-  if (!category) {
-    throw new ApiError(400, 'categoryId tidak valid / kategori tidak ditemukan.');
+  const resolvedCategory = await resolveCategory(categoryInput);
+  if (!resolvedCategory) {
+    throw new ApiError(400, 'Kategori tidak valid / kategori tidak ditemukan.');
   }
 
   const existingBarcode = await Product.findOne({ barcode });
@@ -133,7 +154,7 @@ export const createProduct = catchAsync(async (req, res) => {
     name,
     slug,
     description: description || '',
-    categoryId,
+    categoryId: resolvedCategory._id,
     price,
     discountPrice: discountPrice ?? null,
     images: images || [],
@@ -165,10 +186,14 @@ export const updateProduct = catchAsync(async (req, res) => {
     const clash = await Product.findOne({ sku: updates.sku, _id: { $ne: id } });
     if (clash) throw new ApiError(409, 'sku sudah digunakan oleh produk lain.');
   }
-  if (updates.categoryId) {
-    const category = await Category.findById(updates.categoryId);
-    if (!category) throw new ApiError(400, 'categoryId tidak valid / kategori tidak ditemukan.');
+  const categoryInput = updates.categoryId || updates.category || updates.categoryName;
+  if (categoryInput) {
+    const resolvedCategory = await resolveCategory(categoryInput);
+    if (!resolvedCategory) throw new ApiError(400, 'Kategori tidak valid / kategori tidak ditemukan.');
+    updates.categoryId = resolvedCategory._id;
   }
+  delete updates.category;
+  delete updates.categoryName;
   if (updates.name) {
     updates.slug = slugify(updates.name);
   }
