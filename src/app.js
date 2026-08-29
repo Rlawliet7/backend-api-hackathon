@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.routes.js';
 import usersRoutes from './routes/user.routes.js';
@@ -18,7 +19,7 @@ import posSessionsRoutes from './routes/posSessions.routes.js';
 import { startAutoFinalizeSessionsJob } from './jobs/autoFinalizeSessions.job.js';
 import reviewsRoutes from './routes/reviews.routes.js';
 import productReviewsRoutes from './routes/productReviews.routes.js';
-import errorHandler from './middlewares/errorHandler.middleware.js';
+import errorHandler from './middlewares/errorhandler.middleware.js';
 
 const app = express();
 
