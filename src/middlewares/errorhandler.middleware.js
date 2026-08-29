@@ -13,6 +13,9 @@ const errorHandler = (err, req, res, next) => {
       statusCode = 400;
       message = 'Validasi gagal.';
       errors = Object.values(err.errors).map((e) => ({ field: e.path, message: e.message }));
+    } else if (err.name === 'CastError') {
+      statusCode = 400;
+      message = `Format ${err.path} tidak valid.`;
     } else if (err.code === 11000) {
       // Duplicate key error
       statusCode = 409;

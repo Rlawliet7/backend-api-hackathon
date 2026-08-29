@@ -3,14 +3,15 @@ import mongoose from 'mongoose';
 const deviceScanSchema = new mongoose.Schema(
   {
     deviceId: { type: String, required: true },
-    barcode: { type: String, required: true },
     mode: { type: String, enum: ['restock', 'buy'], required: true },
-    status: { type: String, enum: ['matched', 'unmatched', 'processed'], default: 'matched' },
-    productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', default: null },
-    sessionId: { type: mongoose.Schema.Types.ObjectId, ref: 'OfflineCheckoutSession', default: null },
-    receivedAt: { type: Date, default: Date.now },
+    barcode: { type: String, required: true },
+    matchedProductId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', default: null }, // null jika unmatched
+    status: { type: String, enum: ['matched', 'unmatched'], required: true },
+    deviceUptimeMs: { type: Number, default: null }, // dari firmware, hanya untuk debug
+    receivedAt: { type: Date, default: Date.now }, // waktu resmi, selalu digenerate backend
+    sessionId: { type: mongoose.Schema.Types.ObjectId, ref: 'OfflineCheckoutSession', default: null }, // hanya mode "buy"
   },
-  { timestamps: { createdAt: false, updatedAt: false } }
+  { timestamps: { createdAt: true, updatedAt: false } }
 );
 
 deviceScanSchema.index({ deviceId: 1, receivedAt: -1 });
