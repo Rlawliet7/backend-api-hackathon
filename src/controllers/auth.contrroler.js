@@ -53,7 +53,7 @@ export const register = catchAsync(async (req, res) => {
 
   const existing = await User.findOne({ email: email.toLowerCase() });
   if (existing) {
-    throw new ApiError(409, 'Email sudah terdaftar.');
+    throw new ApiError(400, 'Pendaftaran gagal. Periksa kembali data Anda.');
   }
 
   const hashedPassword = await bcrypt.hash(password, env.BCRYPT_SALT_ROUNDS);

@@ -168,9 +168,10 @@ export const listUsers = catchAsync(async (req, res) => {
 
   if (req.query.role) filter.role = req.query.role;
   if (req.query.search) {
+    const safeSearch = req.query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     filter.$or = [
-      { name: { $regex: req.query.search, $options: 'i' } },
-      { email: { $regex: req.query.search, $options: 'i' } },
+      { name: { $regex: safeSearch, $options: 'i' } },
+      { email: { $regex: safeSearch, $options: 'i' } },
     ];
   }
 

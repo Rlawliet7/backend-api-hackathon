@@ -42,7 +42,8 @@ export const listProducts = catchAsync(async (req, res) => {
   const filter = { isActive: true };
 
   if (search) {
-    filter.name = { $regex: search, $options: 'i' };
+    const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    filter.name = { $regex: safeSearch, $options: 'i' };
   }
 
   if (category) {

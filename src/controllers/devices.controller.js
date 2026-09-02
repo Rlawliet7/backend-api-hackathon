@@ -31,6 +31,7 @@ export const registerDevice = catchAsync(async (req, res) => {
     apiKeyHash,
   });
 
+  res.setHeader('Cache-Control', 'no-store');
   res.status(201).json({
     success: true,
     data: {
@@ -94,6 +95,7 @@ export const regenerateDeviceKey = catchAsync(async (req, res) => {
   device.apiKeyHash = hashApiKey(rawApiKey, env.DEVICE_KEY_HASH_SALT);
   await device.save();
 
+  res.setHeader('Cache-Control', 'no-store');
   res.status(200).json({
     success: true,
     data: {

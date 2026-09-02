@@ -1,4 +1,5 @@
 import env from './config/env.js';
+import {getFirstpage} from './utils/htmlFace.js'
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -16,10 +17,17 @@ import stockRoutes from './routes/stock.routes.js';
 import devicesRoutes from './routes/devices.routes.js';
 import deviceScansRoutes from './routes/deviceScans.routes.js';
 import posSessionsRoutes from './routes/posSessions.routes.js';
-import { startAutoFinalizeSessionsJob } from './jobs/autoFinalizeSessions.job.js';
 import reviewsRoutes from './routes/reviews.routes.js';
+import testimonialsRoutes from './routes/testimonials.routes.js';
 import productReviewsRoutes from './routes/productReviews.routes.js';
+import feedbackRoutes from './routes/feedback.routes.js';
+import vouchersRoutes from './routes/vouchers.routes.js';
+import wishlistRoutes from './routes/wishlist.routes.js';
+import notificationsRoutes from './routes/notifications.routes.js';
+import reportsRoutes from './routes/reports.routes.js';
+import { startAutoFinalizeSessionsJob } from './jobs/autoFinalizeSessions.job.js';
 import errorHandler from './middlewares/errorhandler.middleware.js';
+
 
 const app = express();
 
@@ -28,63 +36,20 @@ connectDB();
 
 // Global middlewares
 app.use(helmet());
-app.use(cors());
-app.use(express.json());
+app.use(cors({ origin: env.CLIENT_URL || '*' }));
+app.use(express.json({ limit: '10kb' }));
 app.use(morgan('dev'));
+
+app.use((req, res, next) => {
+  req.setTimeout(30000);
+  res.setTimeout(30000);
+  next();
+});
 
 const basePath = env.API_BASE_PATH;
 
 app.get('/', (req, res) => {
-  res.type('html').send(`
-    <!doctype html>
-    <html lang="id">
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Backend API Hackathon</title>
-        <style>
-          body {
-            margin: 0;
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
-            font-family: Arial, sans-serif;
-            color: #17202a;
-            background: #f6f8fb;
-          }
-          main {
-            width: min(90vw, 560px);
-            padding: 32px;
-            border: 1px solid #dce3ec;
-            border-radius: 8px;
-            background: #ffffff;
-          }
-          h1 {
-            margin: 0 0 12px;
-            font-size: 28px;
-          }
-          p {
-            margin: 8px 0;
-            line-height: 1.5;
-          }
-          code {
-            padding: 2px 6px;
-            border-radius: 4px;
-            background: #eef2f7;
-          }
-        </style>
-      </head>
-      <body>
-        <main>
-          <h1>Welcome to Backend API Hackathon</h1>
-          <p>Server Express berjalan dengan baik.</p>
-          <p>Health check: <code>/health</code></p>
-          <p>Database check: <code>/check-db</code></p>
-          <p>API base path: <code>${basePath}</code></p>
-        </main>
-      </body>
-    </html>
-  `);
+  res.type('html').send(getFirstpage());
 });
 
 // Health check
@@ -118,7 +83,13 @@ app.use(`${basePath}/device/scans`, deviceScansRoutes);
 app.use(`${basePath}/pos-sessions`, posSessionsRoutes);
 app.use(`${basePath}/products/:productId/reviews`, productReviewsRoutes);
 app.use(`${basePath}/reviews`, reviewsRoutes);
- 
+app.use(`${basePath}/testimonials`, testimonialsRoutes);
+app.use(`${basePath}/feedback`, feedbackRoutes);
+app.use(`${basePath}/vouchers`, vouchersRoutes);
+app.use(`${basePath}/wishlist`, wishlistRoutes);
+app.use(`${basePath}/notifications`, notificationsRoutes);
+app.use(`${basePath}/reports`, reportsRoutes);
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Endpoint tidak ditemukan.' });
@@ -130,6 +101,7 @@ app.use(errorHandler);
 if (!process.env.VERCEL) {
   app.listen(env.PORT, () => {
     console.log(`Server running on port ${env.PORT}`);
+    startAutoFinalizeSessionsJob()
   });
 }
 

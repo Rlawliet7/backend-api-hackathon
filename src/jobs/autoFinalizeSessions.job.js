@@ -1,4 +1,5 @@
 import cron from 'node-cron';
+import mongoose from 'mongoose';
 import { OfflineCheckoutSession } from '../models/index.js';
 import { finalizeSession } from '../services/posSession.service.js';
 import env from '../config/env.js';
@@ -13,6 +14,10 @@ import env from '../config/env.js';
  * di-cancel saja, bukan di-finalize (menghindari order kosong / senilai 0).
  */
 const autoFinalizeTimedOutSessions = async () => {
+  if (mongoose.connection.readyState !== 1) {
+    return;
+  }
+
   const cutoff = new Date(Date.now() - env.SESSION_TIMEOUT_SECONDS * 1000);
 
   const timedOutSessions = await OfflineCheckoutSession.find({

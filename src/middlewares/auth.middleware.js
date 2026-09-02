@@ -47,3 +47,27 @@ export const restrictTo =
     }
     next();
   };
+
+/**
+ * Optional: dipakai untuk endpoint yang tetap bisa diakses publik,
+ * tapi perilakunya berubah kalau ada user login (mis. admin lihat data tambahan).
+ * TIDAK melempar error kalau token tidak ada / tidak valid — cukup lanjut tanpa req.user.
+ */
+export const optionalAuth = catchAsync(async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    try {
+      const payload = verifyAccessToken(token);
+      const user = await User.findById(payload.sub);
+      if (user && user.isActive) {
+        req.user = user;
+      }
+    } catch (err) {
+      // Token invalid/expired -> abaikan saja, tetap perlakukan sebagai publik.
+    }
+  }
+
+  next();
+});
